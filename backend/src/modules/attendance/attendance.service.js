@@ -2,6 +2,12 @@
 
 const prisma = require('../../lib/prisma');
 const { getIO } = require('../../sockets');
+const { z } = require('zod');
+
+const punchSchema = z.object({
+  timestamp: z.string().datetime({ message: 'Invalid ISO timestamp format' }).optional().nullable(),
+  synced_offline: z.boolean().optional().default(false),
+});
 
 // Cutoff configuration (default 10:00 AM)
 const CUTOFF_TIME = process.env.ATTENDANCE_CUTOFF || '10:00';
@@ -65,8 +71,16 @@ function determineStatus(hour, minute) {
  * @param {{ timestamp: string, synced_offline?: boolean }} body 
  */
 async function checkIn(userId, body) {
-  const timestamp = body.timestamp || new Date().toISOString();
-  const synced_offline = body.synced_offline || false;
+  const parsed = punchSchema.safeParse(body);
+  if (!parsed.success) {
+    const error = new Error('Validation failed');
+    error.statusCode = 400;
+    error.details = parsed.error.flatten().fieldErrors;
+    throw error;
+  }
+
+  const timestamp = parsed.data.timestamp || new Date().toISOString();
+  const synced_offline = parsed.data.synced_offline ?? false;
   
   const { hour, minute, dateStr } = getLocalTimeDetails(timestamp);
   const dateMidnight = new Date(dateStr + 'T00:00:00.000Z');
@@ -124,8 +138,16 @@ async function checkIn(userId, body) {
  * @param {{ timestamp: string, synced_offline?: boolean }} body 
  */
 async function checkOut(userId, body) {
-  const timestamp = body.timestamp || new Date().toISOString();
-  const synced_offline = body.synced_offline || false;
+  const parsed = punchSchema.safeParse(body);
+  if (!parsed.success) {
+    const error = new Error('Validation failed');
+    error.statusCode = 400;
+    error.details = parsed.error.flatten().fieldErrors;
+    throw error;
+  }
+
+  const timestamp = parsed.data.timestamp || new Date().toISOString();
+  const synced_offline = parsed.data.synced_offline ?? false;
 
   const { dateStr } = getLocalTimeDetails(timestamp);
   const dateMidnight = new Date(dateStr + 'T00:00:00.000Z');

@@ -1,6 +1,14 @@
 'use strict';
 
 const prisma = require('../../lib/prisma');
+const { z } = require('zod');
+
+const salaryStructureSchema = z.object({
+  basic: z.coerce.number().min(0, 'Basic salary must be non-negative'),
+  hra: z.coerce.number().min(0, 'HRA must be non-negative'),
+  allowances: z.coerce.number().min(0, 'Allowances must be non-negative'),
+  deductions: z.coerce.number().min(0, 'Deductions must be non-negative'),
+});
 
 /**
  * Fetch the most recent salary structure for an employee.
@@ -21,22 +29,18 @@ async function getRecentSalaryStructure(userId) {
  * we keep a complete audit trail of the employee's compensation history (e.g. raises, role changes).
  */
 async function createSalaryStructure(userId, data) {
-  const { basic, hra, allowances, deductions } = data;
-
-  // Validate inputs are numeric
-  const basicVal = parseFloat(basic);
-  const hraVal = parseFloat(hra);
-  const allowancesVal = parseFloat(allowances);
-  const deductionsVal = parseFloat(deductions);
-
-  if (isNaN(basicVal) || isNaN(hraVal) || isNaN(allowancesVal) || isNaN(deductionsVal)) {
-    const err = new Error('All salary fields (basic, hra, allowances, deductions) must be valid numbers.');
+  const parsed = salaryStructureSchema.safeParse(data);
+  if (!parsed.success) {
+    const err = new Error('Validation failed');
     err.statusCode = 400;
+    err.details = parsed.error.flatten().fieldErrors;
     throw err;
   }
 
+  const { basic, hra, allowances, deductions } = parsed.data;
+
   // Calculate net salary
-  const netSalary = basicVal + hraVal + allowancesVal - deductionsVal;
+  const netSalary = basic + hra + allowances - deductions;
 
   // Verify the user exists first
   const user = await prisma.user.findUnique({
@@ -53,10 +57,10 @@ async function createSalaryStructure(userId, data) {
   return prisma.salaryStructure.create({
     data: {
       user_id: userId,
-      basic: basicVal,
-      hra: hraVal,
-      allowances: allowancesVal,
-      deductions: deductionsVal,
+      basic: basic,
+      hra: hra,
+      allowances: allowances,
+      deductions: deductions,
       net_salary: netSalary,
       effective_from: new Date(), // today's date
     },

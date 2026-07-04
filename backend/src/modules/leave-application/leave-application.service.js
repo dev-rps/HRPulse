@@ -2,6 +2,14 @@
 
 const prisma = require('../../lib/prisma');
 const { getIO } = require('../../sockets');
+const { z } = require('zod');
+
+const submitSchema = z.object({
+  leave_type: z.enum(['paid', 'sick', 'unpaid']),
+  start_date: z.string().datetime({ message: 'Invalid start_date format' }).or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)),
+  end_date: z.string().datetime({ message: 'Invalid end_date format' }).or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)),
+  remarks: z.string().max(500).optional().nullable(),
+});
 
 /**
  * Calculate calendar days between two dates (inclusive).
@@ -65,29 +73,18 @@ async function getMyLeaveBalances(userId) {
  * Submit a new leave request with comprehensive validation.
  */
 async function submitLeaveRequest(userId, body) {
-  const { leave_type, start_date, end_date, remarks } = body;
-
-  // Basic validations
-  if (!leave_type || !start_date || !end_date) {
-    const err = new Error('Missing required fields: leave_type, start_date, end_date');
+  const parsed = submitSchema.safeParse(body);
+  if (!parsed.success) {
+    const err = new Error('Validation failed');
     err.statusCode = 400;
+    err.details = parsed.error.flatten().fieldErrors;
     throw err;
   }
 
-  if (!['paid', 'sick', 'unpaid'].includes(leave_type)) {
-    const err = new Error('Invalid leave_type. Must be paid, sick, or unpaid.');
-    err.statusCode = 400;
-    throw err;
-  }
+  const { leave_type, start_date, end_date, remarks } = parsed.data;
 
   const startDate = new Date(start_date);
   const endDate = new Date(end_date);
-
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    const err = new Error('Invalid start_date or end_date format.');
-    err.statusCode = 400;
-    throw err;
-  }
 
   // 1. Validate: end_date >= start_date
   if (endDate < startDate) {
