@@ -77,6 +77,9 @@ We performed a comprehensive integration audit on the unified frontend/backend c
 #### 14. Vercel Prisma Client Generation (`backend/package.json`)
 *   **Fix**: Added a `"build": "prisma generate"` script block to `backend/package.json` to trigger the Prisma Client generation on Vercel's build container automatically, avoiding module import failures (like `createApp is not a function` type errors) caused by missing generated client caches.
 
+#### 15. Serverless Log Visibility (`backend/src/app.js`)
+*   **Fix**: Adjusted the global Express error middleware to print standard console output (`console.error('[ERROR]', err)`) regardless of the execution environment. This enables full stack traces in your private Vercel runtime logs for easier debugging, while keeping client-facing public JSON payloads generic in production to prevent leakage.
+
 ---
 
 ## 🧪 Verification Logs
