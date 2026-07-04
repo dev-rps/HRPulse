@@ -13,12 +13,12 @@ export default function ProfileView({ onEditClick }) {
       try {
         setPayrollLoading(true);
         // Call Member 3's planned payroll endpoint
-        const res = await fetch(`/api/salary-structures/${user.id}`, {
+        const res = await fetch(`/api/payroll/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const json = await res.json();
         if (res.ok) {
-          setPayroll(json);
+          setPayroll(json.data);
         } else if (res.status === 404) {
           // If payroll module has not configured this user yet, or endpoint is not built
           setPayrollError('No salary structure found. Configured by Payroll module.');

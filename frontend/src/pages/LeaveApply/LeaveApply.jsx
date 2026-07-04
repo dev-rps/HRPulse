@@ -4,7 +4,7 @@ import { useSocket } from '../../contexts/SocketContext';
 
 export default function LeaveApply() {
   const { accessToken, user } = useAuth();
-  const { socket } = useSocket();
+  const socket = useSocket();
 
   // Core inputs
   const [leaveType, setLeaveType] = useState('paid');

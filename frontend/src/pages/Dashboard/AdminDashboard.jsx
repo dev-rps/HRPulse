@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import LeaveApprovalCard from './LeaveApprovalCard.jsx';
+import AdminAttendanceView from '../Attendance/AdminAttendanceView.jsx';
 
 export default function AdminDashboard() {
   const { accessToken } = useAuth();
@@ -284,15 +285,7 @@ export default function AdminDashboard() {
 
       {/* Attendance Records tab */}
       {activeTab === 'attendance' && (
-        <div className="bg-surface border border-border rounded-lg shadow-sm p-6 text-center">
-          <div className="max-w-md mx-auto py-8">
-            <span className="text-4xl block mb-4">📅</span>
-            <h2 className="text-lg font-bold text-text mb-2">Attendance Logging & Audit Records</h2>
-            <p className="text-sm text-text-muted leading-relaxed">
-              This module is owned by Member 2. You will be able to review full check-in sheets, offline log synchronization checks, and daily metrics here once Member 2 pushes their route dashboard integration.
-            </p>
-          </div>
-        </div>
+        <AdminAttendanceView />
       )}
 
       {/* Leave Approvals Tab */}
