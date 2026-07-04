@@ -65,10 +65,8 @@ function createApp() {
   app.use((err, _req, res, _next) => {
     const statusCode = err.statusCode ?? 500;
 
-    // Never leak stack traces or internal messages in production
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('[ERROR]', err);
-    }
+    // Log the error to server output (privately visible in Vercel logs)
+    console.error('[ERROR]', err);
 
     res.status(statusCode).json({
       error: statusCode >= 500 ? 'Internal server error' : err.message,
