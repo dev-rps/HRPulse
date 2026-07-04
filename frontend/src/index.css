@@ -1,0 +1,144 @@
+/*
+ * index.css — HRPulse global stylesheet
+ * Imports design tokens and applies Tailwind directives.
+ * All other CSS should use var() from tokens.css or Tailwind utility classes.
+ */
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base resets that extend Tailwind's preflight ────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Consistent focus rings — use token color */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove default list styles */
+  ul, ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Smooth image rendering */
+  img, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Consistent button base */
+  button {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  /* Consistent input base */
+  input, textarea, select {
+    font-family: inherit;
+    font-size: inherit;
+  }
+}
+
+/* ── Utility layer extras (things Tailwind doesn't generate) ─────────────── */
+@layer utilities {
+  /* Sidebar transition */
+  .sidebar-transition {
+    transition: width var(--transition-slow), transform var(--transition-slow);
+  }
+
+  /* Card hover lift — consistent across all quick-access cards */
+  .card-lift {
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+  }
+  .card-lift:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  /* Capacity warning banner — amber, highly visible */
+  .capacity-banner {
+    background-color: var(--color-warning-light);
+    border: 1px solid var(--color-warning);
+    color: #92400E;   /* amber-800 — ONLY inline exception: contrast pair for amber-100 bg */
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  /* Validation error text */
+  .field-error {
+    color: var(--color-error);
+    font-size: var(--font-size-xs);
+    margin-top: var(--space-1);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  /* Notification badge (live unread count) */
+  .badge-live {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-full);
+    font-size: 0.625rem;   /* 10px — intentionally smaller than --font-size-xs */
+    font-weight: 700;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 0.25rem;
+  }
+
+  /* Screen reader only — accessible hidden text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
