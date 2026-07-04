@@ -18,6 +18,8 @@ const morgan = require('morgan');
 // ─── Route modules ────────────────────────────────────────────────────────────
 const authRoutes = require('./auth/auth.routes');
 const leaveRoutes = require('./modules/leave-approval/leave.routes');
+const { leaveRequestsRouter, leaveBalancesRouter } = require('./modules/leave-application/leave-application.routes');
+const payrollRoutes = require('./modules/payroll/payroll.routes');
 
 // ─── App factory ─────────────────────────────────────────────────────────────
 
@@ -44,7 +46,10 @@ function createApp() {
 
   // ── Routes ──────────────────────────────────────────────────────────────────
   app.use('/api/auth', authRoutes);
-  app.use('/api/leave-requests', leaveRoutes);
+  app.use('/api/leave-requests', leaveRequestsRouter); // employee side overrides/extensions
+  app.use('/api/leave-requests', leaveRoutes);          // admin side decision/cancel/list
+  app.use('/api/leave-balances', leaveBalancesRouter);  // leave balances
+  app.use('/api/payroll', payrollRoutes);                // payroll management
 
   // ── 404 handler ─────────────────────────────────────────────────────────────
   app.use((_req, res) => {
