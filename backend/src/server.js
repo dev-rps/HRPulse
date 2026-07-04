@@ -18,21 +18,21 @@ const prisma = require('./lib/prisma');
 
 const PORT = parseInt(process.env.PORT ?? '4000', 10);
 
-async function main() {
-  // ── Verify DB connection before accepting traffic ─────────────────────────
-  try {
-    await prisma.$connect();
-    console.log('[DB] PostgreSQL connected');
-  } catch (err) {
-    console.error('[DB] Failed to connect to database:', err.message);
-    process.exit(1);
-  }
+const app = createApp();
+const httpServer = http.createServer(app);
 
-  const app = createApp();
-  const httpServer = http.createServer(app);
+// Attach Socket.io to the same HTTP server
+initSockets(httpServer);
 
-  // Attach Socket.io to the same HTTP server
-  initSockets(httpServer);
+if (process.env.NODE_ENV !== 'production') {
+  // Dev-only: Verify DB connection before accepting traffic
+  prisma.$connect()
+    .then(() => {
+      console.log('[DB] PostgreSQL connected');
+    })
+    .catch((err) => {
+      console.error('[DB] Failed to connect to database during dev boot:', err.message);
+    });
 
   httpServer.listen(PORT, () => {
     console.log(`\n🚀 HRPulse API running on http://localhost:${PORT}`);
@@ -41,7 +41,7 @@ async function main() {
     console.log(`   Socket.io    : enabled\n`);
   });
 
-  // ── Graceful shutdown ─────────────────────────────────────────────────────
+  // ── Graceful shutdown (Dev only) ──────────────────────────────────────────
   const shutdown = async (signal) => {
     console.log(`\n[SERVER] ${signal} received — shutting down gracefully`);
     httpServer.close(async () => {
@@ -55,7 +55,4 @@ async function main() {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-main().catch((err) => {
-  console.error('[SERVER] Fatal startup error:', err);
-  process.exit(1);
-});
+module.exports = httpServer;

@@ -44,6 +44,7 @@ let _io = null;
  */
 function initSockets(httpServer) {
   _io = new Server(httpServer, {
+    path: '/api/socket-io/socket.io',
     cors: {
       origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173',
       credentials: true,

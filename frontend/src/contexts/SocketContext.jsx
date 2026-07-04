@@ -17,10 +17,11 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // Connect to Socket.io server on backend port (4000)
-    const newSocket = io('http://localhost:4000', {
+    // Connect to Socket.io server using the configured proxy/vercel endpoint path
+    const newSocket = io(window.location.origin, {
+      path: '/api/socket-io/socket.io',
+      transports: ['websocket'],
       auth: { token: accessToken },
-      transports: ['websocket', 'polling'],
       autoConnect: true,
     });
 

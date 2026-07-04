@@ -34,6 +34,7 @@
 - **Engine**: PostgreSQL 16 (Docker image: `postgres:16-alpine`)
 - **ORM**: Prisma 5.22.0 (schema at `backend/prisma/schema.prisma`)
 - **Local dev**: `docker compose up -d` starts Postgres on port 5432 (credentials in `.env.example`)
+- **Production (Vercel)**: Production deployments MUST use a pooled connection string (e.g., Neon connection string ending with `?pgbouncer=true` or Supabase pooled connection string on port `6543`) to prevent database connection pool exhaustion under the serverless function lifecycle.
 
 ### Real-time
 - **Library**: Socket.io 4.x (same HTTP server as Express — no separate port)
