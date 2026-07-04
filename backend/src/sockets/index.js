@@ -45,7 +45,7 @@ let _io = null;
 function initSockets(httpServer) {
   _io = new Server(httpServer, {
     cors: {
-      origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173',
       credentials: true,
     },
     // Transports: prefer websocket, fall back to polling

@@ -319,11 +319,80 @@ async function logout(refreshToken) {
   }
 }
 
+// ─── User Update ─────────────────────────────────────────────────────────────
+
+async function updateUserSelf(userId, body) {
+  const { updateUserSelfSchema } = require('./auth.schema');
+  const parsed = updateUserSelfSchema.safeParse(body);
+  if (!parsed.success) {
+    const err = new Error('Validation failed');
+    err.statusCode = 400;
+    err.details = parsed.error.flatten().fieldErrors;
+    throw err;
+  }
+
+  const { phone, address, profile_picture_url } = parsed.data;
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      phone: phone !== undefined ? phone : undefined,
+      address: address !== undefined ? address : undefined,
+      profile_picture_url: profile_picture_url !== undefined ? profile_picture_url : undefined,
+    },
+  });
+
+  return safeUser(user);
+}
+
+async function updateUserAdmin(userId, body) {
+  const { updateUserAdminSchema } = require('./auth.schema');
+  const parsed = updateUserAdminSchema.safeParse(body);
+  if (!parsed.success) {
+    const err = new Error('Validation failed');
+    err.statusCode = 400;
+    err.details = parsed.error.flatten().fieldErrors;
+    throw err;
+  }
+
+  const { name, email, role, phone, address, profile_picture_url, job_title, department, date_of_joining } = parsed.data;
+
+  if (email) {
+    const existing = await prisma.user.findFirst({
+      where: { email, NOT: { id: userId } },
+    });
+    if (existing) {
+      const err = new Error('Email already in use by another account');
+      err.statusCode = 409;
+      throw err;
+    }
+  }
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name,
+      email,
+      role,
+      phone: phone !== undefined ? phone : undefined,
+      address: address !== undefined ? address : undefined,
+      profile_picture_url: profile_picture_url !== undefined ? profile_picture_url : undefined,
+      job_title: job_title !== undefined ? job_title : undefined,
+      department: department !== undefined ? department : undefined,
+      date_of_joining: date_of_joining !== undefined ? (date_of_joining ? new Date(date_of_joining) : null) : undefined,
+    },
+  });
+
+  return safeUser(user);
+}
+
 module.exports = {
   signup,
   verifyEmail,
   login,
   refresh,
   logout,
+  updateUserSelf,
+  updateUserAdmin,
   REFRESH_COOKIE_NAME,
 };

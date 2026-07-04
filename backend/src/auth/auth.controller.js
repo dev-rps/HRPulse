@@ -113,4 +113,29 @@ async function logout(req, res, next) {
   }
 }
 
-module.exports = { signup, verifyEmail, login, refresh, logout };
+async function updateUserSelf(req, res, next) {
+  try {
+    const user = await authService.updateUserSelf(req.user.id, req.body);
+    return res.status(200).json({ data: user });
+  } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ error: err.message, details: err.details });
+    }
+    next(err);
+  }
+}
+
+async function updateUserAdmin(req, res, next) {
+  try {
+    const { id } = req.params;
+    const user = await authService.updateUserAdmin(id, req.body);
+    return res.status(200).json({ data: user });
+  } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ error: err.message, details: err.details });
+    }
+    next(err);
+  }
+}
+
+module.exports = { signup, verifyEmail, login, refresh, logout, updateUserSelf, updateUserAdmin };

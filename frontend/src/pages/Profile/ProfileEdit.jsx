@@ -111,13 +111,11 @@ export default function ProfileEdit({ onCancel, onSaveComplete }) {
       // 1. Upload Avatar if selected (mocked placeholder matching POST /api/users/me/avatar)
       let profilePictureUrl = user?.profile_picture_url;
       if (avatarFile) {
-        // TODO: Wire up actual POST /api/users/me/avatar endpoint here.
-        // For the hackathon, we simulate a successful upload by using the local preview URL
         profilePictureUrl = avatarPreview;
         console.log('[UPLOAD] Image file ready for submission:', avatarFile.name);
       }
 
-      // 2. Submit profile PATCH data to Member 4's planned endpoint PATCH /api/users/:id
+      // 2. Submit profile PATCH data to endpoint PATCH /api/users/:id
       const payload = {
         phone: formData.phone,
         address: formData.address,
@@ -131,8 +129,6 @@ export default function ProfileEdit({ onCancel, onSaveComplete }) {
         } : {}),
       };
 
-      // TODO: Confirm the exact PATCH route mapping with the team lead.
-      // Below is the planned contract route: PATCH /api/users/:id
       const res = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
@@ -147,17 +143,12 @@ export default function ProfileEdit({ onCancel, onSaveComplete }) {
         throw new Error(json.error || 'Failed to update profile details');
       }
 
-      // If we edited our own profile, reload AuthContext user state with updated payload
-      // In a real environment, the PATCH returns the fresh user object.
-      const updatedUser = { ...user, ...payload };
+      // Reload AuthContext user state with updated payload
+      const updatedUser = { ...user, ...json.data };
       sessionStorage.setItem('user', JSON.stringify(updatedUser));
       onSaveComplete(updatedUser);
     } catch (err) {
-      // Mock save fallback for compile/demonstration robustness if the endpoint is not mounted yet
-      console.warn('API error encountered. Falling back to local save simulation:', err.message);
-      const simulatedUser = { ...user, ...formData, profile_picture_url: avatarPreview };
-      sessionStorage.setItem('user', JSON.stringify(simulatedUser));
-      onSaveComplete(simulatedUser);
+      setSubmitError(err.message);
     } finally {
       setSubmitting(false);
     }

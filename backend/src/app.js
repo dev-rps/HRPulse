@@ -17,8 +17,9 @@ const morgan = require('morgan');
 
 // ─── Route modules ────────────────────────────────────────────────────────────
 const authRoutes = require('./auth/auth.routes');
+const userRoutes = require('./auth/user.routes');
 const leaveRoutes = require('./modules/leave-approval/leave.routes');
-const { leaveRequestsRouter, leaveBalancesRouter } = require('./modules/leave-application/leave-application.routes');
+const { leaveBalancesRouter } = require('./modules/leave-application/leave-application.routes');
 const payrollRoutes = require('./modules/payroll/payroll.routes');
 const attendanceRoutes = require('./modules/attendance/attendance.routes');
 
@@ -30,7 +31,7 @@ function createApp() {
   // ── Middleware ──────────────────────────────────────────────────────────────
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173',
       credentials: true, // Required for httpOnly cookies
     })
   );
@@ -47,8 +48,8 @@ function createApp() {
 
   // ── Routes ──────────────────────────────────────────────────────────────────
   app.use('/api/auth', authRoutes);
-  app.use('/api/leave-requests', leaveRequestsRouter); // employee side overrides/extensions
-  app.use('/api/leave-requests', leaveRoutes);          // admin side decision/cancel/list
+  app.use('/api/users', userRoutes);
+  app.use('/api/leave-requests', leaveRoutes);          // consolidated leaves router (admin + employee)
   app.use('/api/leave-balances', leaveBalancesRouter);  // leave balances
   app.use('/api/payroll', payrollRoutes);                // payroll management
   app.use('/api/attendance', attendanceRoutes);          // attendance check-in/out

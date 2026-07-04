@@ -50,9 +50,29 @@ const verifyEmailSchema = z.object({
   token: z.string().uuid('Invalid verification token format'),
 });
 
+const updateUserSelfSchema = z.object({
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  profile_picture_url: z.string().url('Invalid URL format').or(z.string().length(0)).optional().nullable().or(z.string().regex(/^data:image\//, 'Must be valid image URI')), // allow data URL or standard URL
+});
+
+const updateUserAdminSchema = z.object({
+  name: z.string().min(1, 'Name cannot be empty').optional(),
+  email: z.string().email('Invalid email address').toLowerCase().trim().optional(),
+  role: z.enum(['admin', 'employee']).optional(),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  profile_picture_url: z.string().optional().nullable(),
+  job_title: z.string().optional().nullable(),
+  department: z.string().optional().nullable(),
+  date_of_joining: z.string().datetime({ message: 'Invalid date format' }).optional().nullable().or(z.date().optional().nullable()),
+});
+
 module.exports = {
   signupSchema,
   loginSchema,
   verifyEmailSchema,
   passwordSchema,
+  updateUserSelfSchema,
+  updateUserAdminSchema,
 };
