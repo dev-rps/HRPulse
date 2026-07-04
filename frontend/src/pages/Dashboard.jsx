@@ -1,9 +1,14 @@
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import EmployeeDashboard from './Dashboard/EmployeeDashboard.jsx';
+import AdminDashboard from './Dashboard/AdminDashboard.jsx';
 
 export default function Dashboard() {
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-primary">Dashboard Stub</h1>
-    </div>
-  );
+  const { user } = useAuth();
+
+  if (user?.role === 'admin') {
+    return <AdminDashboard />;
+  }
+
+  return <EmployeeDashboard />;
 }
