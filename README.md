@@ -2,6 +2,10 @@
 
 > Hackathon project for Odoo × Adamas. Real-time HR management system with leave approval, attendance tracking, payroll, and notifications.
 
+## 🔗 Live Link & Demo Video
+* **Live Deployment**: [https://hr-pulse-three.vercel.app](https://hr-pulse-three.vercel.app)
+* **Demo Video Walkthrough**: [Watch Walkthrough Video](https://github.com/user-attachments/assets/b23af00a-d808-4adc-a5ac-9add268138ec)
+
 ## Quick Start
 
 ### Prerequisites
