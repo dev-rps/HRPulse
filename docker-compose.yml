@@ -1,0 +1,33 @@
+version: '3.8'
+
+# ─── HRPulse Local Development Stack ──────────────────────────────────────────
+# Usage:
+#   docker compose up -d          → start Postgres in background
+#   docker compose down           → stop and remove containers
+#   docker compose down -v        → also wipe the database volume (full reset)
+#
+# Connection string (matches .env.example):
+#   postgresql://hrpulse:hrpulse_password@localhost:5432/hrpulse_db
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hrpulse_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hrpulse
+      POSTGRES_PASSWORD: hrpulse_password
+      POSTGRES_DB: hrpulse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - hrpulse_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hrpulse -d hrpulse_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hrpulse_pg_data:
+    driver: local
