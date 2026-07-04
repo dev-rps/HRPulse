@@ -74,6 +74,9 @@ We performed a comprehensive integration audit on the unified frontend/backend c
 #### 13. Environment Configurations (`.env.example`, `project-plan.md`)
 *   **Fix**: Updated template `.env.example` file and the `project-plan.md` documentation indicating production environments must use pooled Postgres connections (Neon/Supabase pooled URLs on port 6543) instead of direct socket URLs to prevent exhaustion.
 
+#### 14. Vercel Prisma Client Generation (`backend/package.json`)
+*   **Fix**: Added a `"build": "prisma generate"` script block to `backend/package.json` to trigger the Prisma Client generation on Vercel's build container automatically, avoiding module import failures (like `createApp is not a function` type errors) caused by missing generated client caches.
+
 ---
 
 ## 🧪 Verification Logs
