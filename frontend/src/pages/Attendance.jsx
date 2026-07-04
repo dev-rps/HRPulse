@@ -1,9 +1,3 @@
-import React from 'react';
-
-export default function Attendance() {
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-primary">Attendance Stub (Member 2)</h1>
-    </div>
-  );
-}
+// This file re-exports the Attendance module owned by Member 2.
+// App.jsx imports from this path — do not modify the import path in App.jsx.
+export { default } from './Attendance/index.jsx';

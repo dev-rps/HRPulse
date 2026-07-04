@@ -12,6 +12,10 @@ export default defineConfig({
         target: 'http://localhost:4000',
         changeOrigin: true,
       },
+      '/health': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
     },
   },
 });

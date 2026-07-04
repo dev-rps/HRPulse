@@ -85,8 +85,13 @@ function initSockets(httpServer) {
     // Join personal room — all targeted events use this room
     socket.join(`user:${userId}`);
 
+    // Join admins room if role is admin (for admin-only broadcasts)
+    if (role === 'admin') {
+      socket.join('admins');
+    }
+
     console.log(
-      `[SOCKET] Connected  → id=${socket.id} user=${employee_id} role=${role} room=user:${userId}`
+      `[SOCKET] Connected  → id=${socket.id} user=${employee_id} role=${role} room=user:${userId}${role === 'admin' ? ' + admins' : ''}`
     );
 
     // ── Client → Server events ───────────────────────────────────────────────
