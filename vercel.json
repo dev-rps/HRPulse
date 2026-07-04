@@ -1,40 +1,25 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "backend/src/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["backend/prisma/**", "backend/src/**"]
-      }
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite"
     },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+    "backend": {
+      "root": "backend"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/socket-io/(.*)",
-      "dest": "backend/src/server.js"
+      "source": "/api(/.*)?",
+      "destination": { "type": "service", "service": "backend" }
     },
     {
-      "src": "/api/(.*)",
-      "dest": "backend/src/server.js"
+      "source": "/health",
+      "destination": { "type": "service", "service": "backend" }
     },
     {
-      "src": "/health",
-      "dest": "backend/src/server.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": { "type": "service", "service": "frontend" }
     }
   ]
 }

@@ -19,10 +19,10 @@ const prisma = require('./lib/prisma');
 const PORT = parseInt(process.env.PORT ?? '4000', 10);
 
 const app = createApp();
-const httpServer = http.createServer(app);
+const server = http.createServer(app);
 
 // Attach Socket.io to the same HTTP server
-initSockets(httpServer);
+initSockets(server);
 
 if (process.env.NODE_ENV !== 'production') {
   // Dev-only: Verify DB connection before accepting traffic
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production') {
       console.error('[DB] Failed to connect to database during dev boot:', err.message);
     });
 
-  httpServer.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`\n🚀 HRPulse API running on http://localhost:${PORT}`);
     console.log(`   Health check : http://localhost:${PORT}/health`);
     console.log(`   Environment  : ${process.env.NODE_ENV ?? 'development'}`);
@@ -44,7 +44,7 @@ if (process.env.NODE_ENV !== 'production') {
   // ── Graceful shutdown (Dev only) ──────────────────────────────────────────
   const shutdown = async (signal) => {
     console.log(`\n[SERVER] ${signal} received — shutting down gracefully`);
-    httpServer.close(async () => {
+    server.close(async () => {
       await prisma.$disconnect();
       console.log('[SERVER] Closed. Goodbye.');
       process.exit(0);
@@ -55,4 +55,4 @@ if (process.env.NODE_ENV !== 'production') {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-module.exports = httpServer;
+module.exports = server;
